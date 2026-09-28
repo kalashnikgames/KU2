@@ -4,31 +4,28 @@ import argparse
 import sys
 
 from src.config import ConfigError, load_settings
-from src.graph import GraphBuilder, print_graph
+from src.graph import GraphBuilder
 from src.models import Package, RepositoryError
-from src.ordering import print_load_order
 from src.repository import make_repository
+from src.visualization import RenderError, save_visualization
 
 
 def main(argv=None):
-    """Построить и показать полный граф зависимостей."""
+    """Построить граф и сохранить Mermaid с PNG."""
     parser = argparse.ArgumentParser(description="Граф зависимостей NuGet")
     parser.add_argument("config", help="путь к TOML-конфигурации")
-    parser.add_argument("--load-order", action="store_true",
-                        help="порядок загрузки (этап 4)")
     args = parser.parse_args(argv)
     try:
         settings = load_settings(args.config)
         repository = make_repository(settings)
         package = Package(settings.package, settings.version)
         graph = GraphBuilder(repository, settings.filter).build(package)
-        if args.load_order:
-            print_load_order(graph)
-        else:
-            print_graph(graph)
-    except (ConfigError, RepositoryError) as error:
+        source, output = save_visualization(graph, settings.output)
+    except (ConfigError, RepositoryError, RenderError) as error:
         print(error, file=sys.stderr)
         return 1
+    print(f"Mermaid: {source}")
+    print(f"PNG: {output}")
     return 0
 
 

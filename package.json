@@ -1,0 +1,8 @@
+{
+  "name": "nuget-dependency-graph",
+  "private": true,
+  "description": "Mermaid rendering only; dependency analysis is Python",
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "12.0.0"
+  }
+}
