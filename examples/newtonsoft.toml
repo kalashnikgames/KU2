@@ -1,0 +1,6 @@
+package = "Newtonsoft.Json"
+repository = "https://api.nuget.org/v3/index.json"
+test_mode = false
+version = "13.0.3"
+output = "../output/newtonsoft.png"
+filter = ""

@@ -2,23 +2,30 @@
 
 import argparse
 import sys
-from dataclasses import asdict
 
 from src.config import ConfigError, load_settings
+from src.models import Package, RepositoryError
+from src.repository import make_repository
 
 
 def main(argv=None):
-    """Загрузить конфигурацию и вывести пары ключ-значение."""
+    """Прочитать настройки и вывести прямые зависимости пакета."""
     parser = argparse.ArgumentParser(description="Граф зависимостей NuGet")
     parser.add_argument("config", help="путь к TOML-конфигурации")
     args = parser.parse_args(argv)
     try:
         settings = load_settings(args.config)
-    except ConfigError as error:
+        repository = make_repository(settings)
+        package = Package(settings.package, settings.version)
+        dependencies = repository.direct(package)
+    except (ConfigError, RepositoryError) as error:
         print(error, file=sys.stderr)
         return 1
-    for key, value in asdict(settings).items():
-        print(f"{key}={value}")
+    print(f"Прямые зависимости {package.label} ({settings.framework}):")
+    for dependency in dependencies:
+        print(f"{dependency.name} {dependency.constraint}")
+    if not dependencies:
+        print("(нет)")
     return 0
 
 
