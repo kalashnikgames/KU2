@@ -4,12 +4,13 @@ import argparse
 import sys
 
 from src.config import ConfigError, load_settings
+from src.graph import GraphBuilder, print_graph
 from src.models import Package, RepositoryError
 from src.repository import make_repository
 
 
 def main(argv=None):
-    """Прочитать настройки и вывести прямые зависимости пакета."""
+    """Построить и показать полный граф зависимостей."""
     parser = argparse.ArgumentParser(description="Граф зависимостей NuGet")
     parser.add_argument("config", help="путь к TOML-конфигурации")
     args = parser.parse_args(argv)
@@ -17,15 +18,11 @@ def main(argv=None):
         settings = load_settings(args.config)
         repository = make_repository(settings)
         package = Package(settings.package, settings.version)
-        dependencies = repository.direct(package)
+        graph = GraphBuilder(repository, settings.filter).build(package)
     except (ConfigError, RepositoryError) as error:
         print(error, file=sys.stderr)
         return 1
-    print(f"Прямые зависимости {package.label} ({settings.framework}):")
-    for dependency in dependencies:
-        print(f"{dependency.name} {dependency.constraint}")
-    if not dependencies:
-        print("(нет)")
+    print_graph(graph)
     return 0
 
 

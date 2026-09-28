@@ -1,0 +1,6 @@
+package = "A"
+repository = "isolated.json"
+test_mode = true
+version = "1.0.0"
+output = "../output/isolated.png"
+filter = ""
