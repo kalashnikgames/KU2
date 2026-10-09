@@ -47,7 +47,8 @@ def to_mermaid(graph):
         lines.append(f'    {identifier}["{label}"]')
     for package, children in graph.edges.items():
         for child in children:
-            lines.append(f"    {identifiers[package]} --> {identifiers[child]}")
+            lines.append(
+                f"    {identifiers[package]} --> {identifiers[child]}")
     lines.append("    classDef root fill:#dbeafe,stroke:#1d4ed8,"
                  "stroke-width:3px")
     lines.append(f"    class {identifiers[graph.root]} root")
@@ -61,7 +62,8 @@ def renderer_command():
     cli = Path(os.environ.get("MERMAID_CLI", str(default)))
     node = shutil.which("node")
     if not node or not cli.is_file():
-        raise RenderError("нужны Node.js и Mermaid CLI: выполните npm install")
+        raise RenderError(
+            "нужны Node.js и Mermaid CLI: выполните npm install")
     return [node, str(cli.resolve())]
 
 

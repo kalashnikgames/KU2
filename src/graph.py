@@ -31,7 +31,7 @@ class GraphBuilder:
         return bool(self.substring and self.substring in name.casefold())
 
     def intern(self, package):
-        """Получить единую вершину для имени и версии независимо от регистра."""
+        """Получить вершину для имени и версии независимо от регистра."""
         key = (package.name.casefold(), normalize_version(package.version))
         if key not in self.packages:
             self.packages[key] = Package(package.name, key[1])
