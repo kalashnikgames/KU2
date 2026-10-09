@@ -78,7 +78,8 @@ def validate_values(values, base):
     substring = require_text(values, "filter", allow_empty=True)
     framework = values.get("framework", "net8.0")
     valid_framework = isinstance(framework, str)
-    valid_framework = valid_framework and re.fullmatch(r"net[89]\.0", framework)
+    valid_framework = valid_framework and re.fullmatch(r"net[89]\.0",
+                                                       framework)
     if not valid_framework:
         raise ConfigError("framework: поддерживаются net8.0 и net9.0")
     return Settings(package, repository, values["test_mode"], version,

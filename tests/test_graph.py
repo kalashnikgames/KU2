@@ -17,7 +17,8 @@ class MemoryRepository:
     def direct(self, package):
         """Записать обращение и вернуть соседей."""
         self.calls.append(package.name)
-        return [Dependency(name, "1.0.0") for name in self.graph[package.name]]
+        return [Dependency(name, "1.0.0") for name in
+                self.graph[package.name]]
 
     def resolve(self, name, constraint):
         """Всем тестовым вершинам назначить одинаковую версию."""
