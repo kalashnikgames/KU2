@@ -51,7 +51,7 @@ class NugetRepository:
                 and isinstance(item.get("@id"), str)
             ]
             if not addresses:
-                raise RepositoryError("NuGet V3: нет PackageBaseAddress/3.0.0")
+                raise RepositoryError("NuGet V3: no PackageBaseAddress/3.0.0")
             url = addresses[0]
         self.base = url.rstrip("/") + "/"
 
