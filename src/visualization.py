@@ -9,6 +9,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
+from src.versions import constraint_predicate
+
 
 LABEL_WIDTH = 32
 RENDER_TIMEOUT = 120
@@ -21,8 +23,8 @@ class RenderError(Exception):
     """Ошибка отрисовки или записи изображения."""
 
 
-def package_label(package):
-    """Разбить длинное имя по точкам и безопасно подписать вершину."""
+def package_label(package, predicate):
+    """Разбить имя по точкам и безопасно подписать условие вершины."""
     lines = []
     current = ""
     for part in package.name.split("."):
@@ -32,7 +34,7 @@ def package_label(package):
             current = part
         else:
             current = candidate
-    lines.extend([current, package.version])
+    lines.extend([current, predicate])
     return "<br/>".join(html.escape(line, quote=True) for line in lines)
 
 
@@ -42,7 +44,9 @@ def to_mermaid(graph):
                    for index, package in enumerate(graph.discovery)}
     lines = ["flowchart LR"]
     for package in graph.discovery:
-        label = package_label(package)
+        predicate = (f"={package.version}" if package == graph.root else
+                     constraint_predicate(graph.requirements[package]))
+        label = package_label(package, predicate)
         identifier = identifiers[package]
         lines.append(f'    {identifier}["{label}"]')
     for package, children in graph.edges.items():

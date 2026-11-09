@@ -8,11 +8,12 @@ from src.versions import normalize_version
 
 @dataclass
 class Graph:
-    """Корень, ребра и порядок первого обнаружения вершин."""
+    """Корень, ребра, условия зависимостей и порядок обнаружения."""
 
     root: Package
     edges: dict = field(default_factory=dict)
     discovery: list = field(default_factory=list)
+    requirements: dict = field(default_factory=dict)
 
 
 class GraphBuilder:
@@ -60,6 +61,9 @@ class GraphBuilder:
                 child = self.intern(self.repository.resolve(
                     dependency.name, dependency.constraint
                 ))
+                self.graph.requirements.setdefault(child, []).append(
+                    dependency.constraint
+                )
                 if child not in children:
                     children.append(child)
                 if child not in self.discovered:

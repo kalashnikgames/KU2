@@ -56,6 +56,36 @@ def range_bounds(constraint):
     return text, None, True, True
 
 
+def constraint_predicate(constraints):
+    """Пересечь диапазоны и показать их наиболее строгие границы."""
+    lower = upper = None
+    include_lower = include_upper = True
+    for constraint in constraints:
+        candidate_lower, candidate_upper, lower_inclusive, upper_inclusive = (
+            range_bounds(constraint)
+        )
+        if candidate_lower is not None:
+            if lower is None or version_key(candidate_lower) > version_key(lower):
+                lower, include_lower = candidate_lower, lower_inclusive
+            elif version_key(candidate_lower) == version_key(lower):
+                include_lower = include_lower and lower_inclusive
+        if candidate_upper is not None:
+            if upper is None or version_key(candidate_upper) < version_key(upper):
+                upper, include_upper = candidate_upper, upper_inclusive
+            elif version_key(candidate_upper) == version_key(upper):
+                include_upper = include_upper and upper_inclusive
+    if (lower is not None and upper is not None
+            and version_key(lower) == version_key(upper)
+            and include_lower and include_upper):
+        return f"={lower}"
+    bounds = []
+    if lower is not None:
+        bounds.append(f"{'>=' if include_lower else '>'}{lower}")
+    if upper is not None:
+        bounds.append(f"{'<=' if include_upper else '<'}{upper}")
+    return ", ".join(bounds) or "*"
+
+
 def satisfies(version, constraint):
     """Проверить границы; не выбирать prerelease без явного разрешения."""
     key = version_key(version)
